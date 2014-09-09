@@ -4,7 +4,7 @@ import pymorse
 import time
 import math
 import yaml
-from random import randint
+import random
 import threading
 
 class Human:
@@ -37,8 +37,21 @@ class Human:
     
             # plan the next waypoint
             print("Human" + str(self.human_id) + " is in " + wp_name)
-            next_wp_name = self.movement_plan[wp_name][randint(0,
-                len(self.movement_plan[wp_name])-1)]
+            #next_wp_name = self.movement_plan[wp_name][randint(0,
+            #    len(self.movement_plan[wp_name])-1)]
+            max_rand = 0
+            for val in self.movement_plan[wp_name].values():
+                max_rand += val
+
+            low_thres = 0
+            rand = random.random() * max_rand
+            for keys, vals in self.movement_plan[wp_name].items():
+                if low_thres <= rand and rand < vals + low_thres:
+                    next_wp_name = keys
+                    break
+                else:
+                    low_thres += vals
+
             next_wp = self.wp_dict[next_wp_name]
     
             if next_wp_name != wp_name:
@@ -156,7 +169,7 @@ class Human:
             time.sleep(0.1)
 
             while self.morse.rpc(morse_command[0], 'get_status') != 'Arrived':
-                if randint(0,8) == 4:
+                if random.randint(0,8) == 4:
                     self.last_10pos = self.last_10pos[1:] + \
                         [self.get_pose(self.human_id)]
 
